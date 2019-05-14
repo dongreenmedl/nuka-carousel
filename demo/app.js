@@ -9,16 +9,19 @@ class App extends React.Component {
     super(...arguments);
     this.state = {
       slideIndex: 0,
-      length: 6,
-      wrapAround: false,
+      length: 4,
+      wrapAround: true,
       animation: undefined,
       underlineHeader: false,
-      zoomScale: 0.5,
+      zoomScale: 1,
+      opacityScale: 1,
       slidesToShow: 1,
-      cellAlign: 'left',
-      transitionMode: 'scroll',
+      cellAlign: 'center',
+      transitionMode: 'scroll3d',
       heightMode: 'max',
-      withoutControls: false
+      withoutControls: false,
+      cellSpacing: 16,
+      slideWidth: '100px'
     };
 
     this.handleImageClick = this.handleImageClick.bind(this);
@@ -37,18 +40,21 @@ class App extends React.Component {
 
   render() {
     return (
-      <div style={{ width: '50%', margin: 'auto' }}>
+      <div style={{ width: '80%', margin: 'auto' }}>
         <Carousel
           slidesToShow={this.state.slidesToShow}
           slidesToScroll={this.state.slidesToScroll}
           withoutControls={this.state.withoutControls}
           transitionMode={this.state.transitionMode}
           cellAlign={this.state.cellAlign}
+          cellSpacing={this.state.cellSpacing || 0}
           animation={this.state.animation}
           zoomScale={Number(this.state.zoomScale || 0)}
+          opacityScale={Number(this.state.opacityScale || 0)}
           wrapAround={this.state.wrapAround}
           slideIndex={this.state.slideIndex}
           heightMode={this.state.heightMode}
+          slideWidth={this.state.slideWidth}
           renderTopCenterControls={({ currentSlide }) => (
             <div
               style={{
@@ -69,13 +75,13 @@ class App extends React.Component {
           {colors.slice(0, this.state.length).map((color, index) => (
             <img
               src={`http://placehold.it/1000x400/${color}/ffffff/&text=slide${index +
-                1}`}
+              1}`}
               alt={`Slide ${index + 1}`}
               key={color}
               onClick={this.handleImageClick}
               style={{
                 height:
-                  this.state.heightMode === 'current' ? 100 * (index + 1) : 400
+                  this.state.heightMode === 'current' ? 100 * (index + 1) : 400,
               }}
             />
           ))}

@@ -8,7 +8,12 @@ export default class ScrollTransition3D extends React.Component {
   constructor(props) {
     super(props);
 
+    this.refs = [];
     this.getListStyles = this.getListStyles.bind(this);
+  }
+
+  componentWillMount() {
+    this.refs = [];
   }
 
   getSlideDirection(start, end, isWrapping) {
@@ -72,6 +77,12 @@ export default class ScrollTransition3D extends React.Component {
           }`}
           style={this.getSlideStyles(index, positionValue)}
           key={index}
+          ref={ref => {
+            if (!ref) {
+              return;
+            }
+            this.refs[index] = ref;
+          }}
         >
           {child}
         </li>
@@ -173,8 +184,16 @@ export default class ScrollTransition3D extends React.Component {
   }
 
   getSlideStyles(index, positionValue) {
+    const currentItem = this.refs[index];
+    const prevTargetPosition = currentItem
+      ? parseInt(currentItem.style.left.replace('px', ''), 10)
+      : 0;
     const targetPosition = this.getSlideTargetPosition(index, positionValue);
     const transformScale = this.getTransformScale(index);
+    const disableTransition =
+      Math.abs(targetPosition - prevTargetPosition) >
+      this.props.slideWidth + this.props.cellSpacing;
+
     return {
       zIndex: this.props.slideCount - this.getDistanceToCurrentSlide(index),
       boxSizing: 'border-box',
@@ -190,11 +209,14 @@ export default class ScrollTransition3D extends React.Component {
       position: 'absolute',
       top: this.props.vertical ? targetPosition : 0,
       transform: `scale(${transformScale})`,
-      transition:
-        'left 0.4s ease-out, transform 0.4s ease-out, opacity 0.4s ease-out',
+      transition: `left ${
+        disableTransition ? '0s' : '0.4s'
+      } ease-out, transform 0.4s ease-out, opacity ${
+        disableTransition ? '0s' : '0.8s'
+      } ease-out`,
       verticalAlign: 'top',
       width: this.props.vertical ? '100%' : this.props.slideWidth,
-      opacity: this.getOpacityScale(index)
+      opacity: disableTransition ? 0 : this.getOpacityScale(index)
     };
   }
 
